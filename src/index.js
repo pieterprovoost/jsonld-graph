@@ -23,6 +23,16 @@ async function generateGraph(input) {
         }
     }
     
+    function addLink(links, link) {
+        if (link.source && link.target) {
+            links.push({
+                source: link.source,
+                target: link.target,
+                type: link.type
+            });
+        }
+    }
+
     for (const node of expanded) {
         addNode(nodes, node);
     
@@ -31,7 +41,7 @@ async function generateGraph(input) {
         if ("https://schema.org/parentOrganization" in node) {
             for (const item of node["https://schema.org/parentOrganization"]) {
                 addNode(nodes, item);
-                links.push({
+                addLink(links, {
                     source: node["@id"],
                     target: item["@id"],
                     type: "parentOrganization"
@@ -44,7 +54,7 @@ async function generateGraph(input) {
         if ("https://schema.org/about" in node) {
             for (const item of node["https://schema.org/about"]) {
                 addNode(nodes, item);
-                links.push({
+                addLink(links, {
                     source: node["@id"],
                     target: item["@id"],
                     type: "about"
@@ -57,7 +67,7 @@ async function generateGraph(input) {
         if ("https://schema.org/author" in node) {
             for (const item of node["https://schema.org/author"]) {
                 addNode(nodes, item);
-                links.push({
+                addLink(links, {
                     source: node["@id"],
                     target: item["@id"],
                     type: "author"
@@ -70,7 +80,7 @@ async function generateGraph(input) {
         if ("https://schema.org/includedInDataCatalog" in node) {
             for (const item of node["https://schema.org/includedInDataCatalog"]) {
                 addNode(nodes, item);
-                links.push({
+                addLink(links, {
                     source: node["@id"],
                     target: item["@id"],
                     type: "includedInDataCatalog"
@@ -83,7 +93,7 @@ async function generateGraph(input) {
         if ("https://schema.org/variableMeasured" in node) {
             for (const item of node["https://schema.org/variableMeasured"]) {
                 addNode(nodes, item);
-                links.push({
+                addLink(links, {
                     source: node["@id"],
                     target: item["@id"],
                     type: "variableMeasured"
@@ -123,6 +133,7 @@ drawGraph(jsonGraph);
 
 async function updateGraph() {
     const jsonGraph = await generateGraph(JSON.parse(document.getElementById("jsonld").value));
+    console.log(jsonGraph);
     drawGraph(jsonGraph);
 }
 document.getElementById("visualize").addEventListener("click", updateGraph);
