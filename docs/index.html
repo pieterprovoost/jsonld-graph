@@ -36,6 +36,11 @@ a {
 <div class="container mt-3">
     <div class="row">
         <div class="col">
+            <p>Visualization of JSON-LD graphs. To visualize a graph from an online document, add the <code>?url=</code> parameter.</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
             <div id="container"></div>
         </div>
     </div>
@@ -57,18 +62,31 @@ a {
 <script src="jsonldviz.min.js"></script>
 
 <script>
-document.getElementById("jsonld").innerHTML = JSON.stringify(example, null, 2);
-async function updateGraph() {
-    const jsonGraph = await jsonldviz.generateGraph(JSON.parse(document.getElementById("jsonld").value));
-    new jsonldviz.JsonldViz({
-        parentElement: "#container",
-        margin: {top: 30, right: 80, bottom: 5, left: 5},
-        width: 1100,
-        height: 500
-    }, jsonGraph);
+async function run() {
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const url = urlParams.get("url");
+    if (url) {
+        const response = await fetch(url);
+        const data = await response.json();
+        document.getElementById("jsonld").innerHTML = JSON.stringify(data, null, 2);
+    } else {
+        document.getElementById("jsonld").innerHTML = JSON.stringify(example, null, 2);
+    }
+    async function updateGraph() {
+        const jsonGraph = await jsonldviz.generateGraph(JSON.parse(document.getElementById("jsonld").value));
+        new jsonldviz.JsonldViz({
+            parentElement: "#container",
+            margin: {top: 30, right: 80, bottom: 5, left: 5},
+            width: 1100,
+            height: 500
+        }, jsonGraph);
+    }
+    document.getElementById("visualize").addEventListener("click", updateGraph);
+    updateGraph();
 }
-document.getElementById("visualize").addEventListener("click", updateGraph);
-updateGraph();
+
+run();
 </script>
 
 </body>
