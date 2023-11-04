@@ -3,7 +3,7 @@
 import * as d3 from "d3";
 export { generateGraph } from "./graph";
 
-export class JsonldGraph {
+export class JsonldViz {
     constructor(config, data) {
         this.config = {
             parentElement: config.parentElement,

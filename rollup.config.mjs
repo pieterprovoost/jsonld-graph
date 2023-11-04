@@ -3,10 +3,10 @@ import babel from "@rollup/plugin-babel";
 export default {
     input: "src/index.js",
     output: {
-        file: "docs/jsonldgraph.min.js",
+        file: "docs/jsonldviz.min.js",
         format: "iife",
         sourceMap: "inline",
-        name: "jsonldgraph",
+        name: "jsonldviz",
         globals: {
             "d3": "d3",
             "jsonld": "jsonld"
