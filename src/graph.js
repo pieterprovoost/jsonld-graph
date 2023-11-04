@@ -2,6 +2,7 @@ import jsonld from "jsonld";
 
 export async function generateGraph(input) {
     const expanded = await jsonld.expand(input);
+
     const nodes = {};
     const links = [];
     
@@ -23,81 +24,34 @@ export async function generateGraph(input) {
             links.push({
                 source: link.source,
                 target: link.target,
-                type: link.type
+                type: link.type.split("/").pop()
             });
         }
     }
 
-    for (const node of expanded) {
-        addNode(nodes, node);
-    
-        // parentOrganization
-    
-        if ("http://schema.org/parentOrganization" in node) {
-            for (const item of node["http://schema.org/parentOrganization"]) {
+    function recursiveTraversal(list) {
+        list.forEach(item => {
+            if (item["@id"] && item["@type"]) {
                 addNode(nodes, item);
-                addLink(links, {
-                    source: node["@id"],
-                    target: item["@id"],
-                    type: "parentOrganization"
+                Object.keys(item).forEach(key => {
+                    if (Array.isArray(item[key]) && item[key].length > 0 && typeof item[key][0] === "object") {
+                        item[key].forEach(subitem => {
+                            addNode(nodes, subitem);
+                            addLink(links, {
+                                source: item["@id"],
+                                target: subitem["@id"],
+                                type: key
+                            });
+                        });
+                        recursiveTraversal(item[key]);
+                    }
                 });
+    
             }
-        }
-    
-        // about
-    
-        if ("http://schema.org/about" in node) {
-            for (const item of node["http://schema.org/about"]) {
-                addNode(nodes, item);
-                addLink(links, {
-                    source: node["@id"],
-                    target: item["@id"],
-                    type: "about"
-                });
-            }
-        }
-    
-        // author
-    
-        if ("http://schema.org/author" in node) {
-            for (const item of node["http://schema.org/author"]) {
-                addNode(nodes, item);
-                addLink(links, {
-                    source: node["@id"],
-                    target: item["@id"],
-                    type: "author"
-                });
-            }
-        }
-    
-        // includedInDataCatalog
-    
-        if ("http://schema.org/includedInDataCatalog" in node) {
-            for (const item of node["http://schema.org/includedInDataCatalog"]) {
-                addNode(nodes, item);
-                addLink(links, {
-                    source: node["@id"],
-                    target: item["@id"],
-                    type: "includedInDataCatalog"
-                });
-            }
-        }
-    
-        // variableMeasured
-    
-        if ("http://schema.org/variableMeasured" in node) {
-            for (const item of node["http://schema.org/variableMeasured"]) {
-                addNode(nodes, item);
-                addLink(links, {
-                    source: node["@id"],
-                    target: item["@id"],
-                    type: "variableMeasured"
-                });
-            }
-        }
-    
+        });
     }
-    
+      
+    recursiveTraversal(expanded);
     const nodeIds = Object.entries(nodes).reduce((acc, [key, value], index) => {
         acc[key] = index;
         return acc;
