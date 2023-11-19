@@ -74,7 +74,7 @@ async function run() {
         document.getElementById("jsonld").innerHTML = JSON.stringify(example, null, 2);
     }
     async function updateGraph() {
-        const jsonGraph = await jsonldviz.generateGraph(JSON.parse(document.getElementById("jsonld").value));
+        const jsonGraph = await jsonldviz.generateGraph(document.getElementById("jsonld").value);
         new jsonldviz.JsonldViz({
             parentElement: "#container",
             margin: {top: 30, right: 80, bottom: 5, left: 5},
