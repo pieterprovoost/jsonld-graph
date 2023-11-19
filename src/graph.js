@@ -3,7 +3,6 @@ import jsonld from "jsonld";
 export async function generateGraph(input) {
     const regex = /\/\*[\s\S]*?\*\/|\s\/\/.*\n/g;
     const cleaned = input.replaceAll(regex, "");
-    console.log(cleaned)
     const parsed = JSON.parse(cleaned);
     const expanded = await jsonld.expand(parsed);
 
